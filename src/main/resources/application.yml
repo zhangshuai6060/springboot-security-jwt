@@ -1,0 +1,18 @@
+server:
+  port: 8010
+spring:
+  application:
+    name: springboot-security-jwt
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost/test?useUnicode=true&characterEncoding=utf8&useSSL=false&zeroDateTimeBehavior=convertToNull
+    password: root
+    username: root
+
+## 设置jwt的信息
+jwt:
+  secret: zheshiyigexiangmyuzhongdemiyaonizhidaolealdahwhdr
+  # 有效期，单位秒，默认2周
+  expire-time-in-second: 1209600
+  header: token
+  path: /login
