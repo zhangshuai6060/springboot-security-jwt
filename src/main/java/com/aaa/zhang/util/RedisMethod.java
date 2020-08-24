@@ -43,6 +43,10 @@ public class RedisMethod {
         RBucket<Object> result = this.redissonClient.getBucket(key);
         if (!result.isExists()) {
             result.set(value);
+        }else {
+            //如果存在
+            result.delete();
+            result.set(value);
         }
     }
 
