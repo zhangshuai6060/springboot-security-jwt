@@ -3,6 +3,8 @@ package com.aaa.zhang.service;
 
 import com.aaa.zhang.entity.SysAuthUser;
 import com.aaa.zhang.util.JwtUser;
+import com.aaa.zhang.util.RedisMethod;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,7 +24,7 @@ import java.util.Set;
 public class UserDetailsServiceImpl implements UserDetailsService {
 
     @Resource
-    AuthUserService authUserService;
+    private AuthUserService authUserService;
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {

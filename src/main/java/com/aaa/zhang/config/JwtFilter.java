@@ -5,6 +5,9 @@ import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import com.aaa.zhang.util.JwtUser;
+import com.aaa.zhang.util.RedisMethod;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -22,12 +25,12 @@ import io.jsonwebtoken.ExpiredJwtException;
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 
-    @Autowired
-    private UserDetailsService userDetailsService;
 
     @Autowired
     private JwtUtils jwtUtils;
 
+    @Autowired
+    private RedisMethod redisMethod;
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain)
@@ -48,9 +51,10 @@ public class JwtFilter extends OncePerRequestFilter {
                 System.out.println("JWT Token has expired");
             }
         }
-        //如果当前令牌有效 并且 获取不到 Security中的认证信息
+        //每次都会走这个 并且每次都会去刷新一个数据库
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            UserDetails userDetails = this.userDetailsService.loadUserByUsername(username);
+            //这里我们把用户信息放到redis中 然后每次如果token成功去根据redis的信息 重新制造一下 放到SecurityContextHolder中
+            UserDetails userDetails = redisMethod.getResult(username);
             //我们拿着用户名 去请求一次 Security 然后我们手动设置到 Security中
             if (jwtUtils.validateToken(jwtToken, userDetails)) {
                 UsernamePasswordAuthenticationToken usernamePasswordAuthenticationToken = new UsernamePasswordAuthenticationToken(

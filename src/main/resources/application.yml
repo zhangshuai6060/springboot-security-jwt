@@ -9,10 +9,16 @@ spring:
     password: root
     username: root
 
-## 设置jwt的信息
+
+redis:
+  password: root
+  database: 0
+  address: localhost
+  port: 6379
+
+
 jwt:
   secret: zheshiyigexiangmyuzhongdemiyaonizhidaolealdahwhdr
-  # 有效期，单位秒，默认2周
   expire-time-in-second: 1209600
   header: token
   path: /login

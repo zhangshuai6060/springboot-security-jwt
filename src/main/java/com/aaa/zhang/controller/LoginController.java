@@ -3,6 +3,7 @@ package com.aaa.zhang.controller;
 import com.aaa.zhang.config.JwtUtils;
 import com.aaa.zhang.dto.LoginDTO;
 import com.aaa.zhang.util.JwtUser;
+import com.aaa.zhang.util.RedisMethod;
 import com.aaa.zhang.util.Result;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -21,10 +22,10 @@ import org.springframework.web.bind.annotation.RestController;
 public class LoginController {
 
     /**
-     *  的认证管理器
+     *  认证管理器
      */
     @Autowired
-    AuthenticationManager authenticationManager;
+    private AuthenticationManager authenticationManager;
 
     /**
      * security 验证 用户名和密码
@@ -33,7 +34,10 @@ public class LoginController {
     private UserDetailsService userDetailsService;
 
     @Autowired
-    JwtUtils jwtUtils;
+    private RedisMethod redisMethod;
+
+    @Autowired
+    private JwtUtils jwtUtils;
 
     @PostMapping("login")
     public Result createAuthenticationToken(@RequestBody LoginDTO loginDTO) throws Exception {
@@ -42,7 +46,10 @@ public class LoginController {
         if(result == null)
         {
             final JwtUser userDetails = (JwtUser) userDetailsService.loadUserByUsername(loginDTO.getUsername());
-            System.out.println("userDetails = " + userDetails.getId());
+            //这里把密码弄成null让redis中看不见我们的密码信息
+            userDetails.setPassword(null);
+            //把用户名当做key 存储到redis中
+            redisMethod.setString(loginDTO.getUsername(),userDetails);
             //生成token 返回给前台
             final String token = jwtUtils.generateToken(userDetails);
             return Result.ok("成功",token);
